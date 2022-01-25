@@ -36,7 +36,7 @@ config.vm.provider "virtualbox" do |v|
     В качестве ответа приведите команды, которые позволили вам добиться указанного вывода или соответствующие скриншоты.
 	```bash
 	mkdir /tmp/new_path_directory
-	export PATH=$PATH:/tmp/new_path_directory
+	export PATH=/tmp/new_path_directory:$PATH
 	sudo cp /usr/bin/bash /usr/local/bin/bash
 	sudo cp /usr/bin/bash /tmp/new_path_directory/bash
 	```
