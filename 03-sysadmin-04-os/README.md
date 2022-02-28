@@ -5,7 +5,53 @@
     * поместите его в автозагрузку,
     * предусмотрите возможность добавления опций к запускаемому процессу через внешний файл (посмотрите, например, на `systemctl cat cron`),
     * удостоверьтесь, что с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.
+   
+   # Ответ
+   установил node_exporter 
+   ```bash
+   wget https://github.com/prometheus/node_exporter/releases/download/v*/node_exporter-*.*-amd64.tar.gz
+   tar xvfz node_exporter-1.3.1.linux-amd64.tar.gz
+   cd node_exporter-1.3.1.linux-amd64.tar.gz
+   ```
+   
+   создал unit файл
+   ```bash 
+   nano /etc/systemd/system/node_exporter.service
+   ```
+   содержимое:
+   ```bash
+   [Unit]
+   Description=Node Exporter
 
+   [Service]
+   ExecStart=/home/vagrant/node_exporter-1.3.1.linux-amd64/node_exporter
+   EnvironmentFile=/etc/default/node_exporter
+
+   [Install]
+   WantedBy=default.target
+   ```
+   и создал файл с переменными
+   ```bash
+   nano /etc/default/node_exporter
+   ```
+   добавил файл в автозагрузку
+   ```bash
+   sudo systemctl enable node_exporter.service
+   ```
+   
+   так же пробросил порт 9100 с ВМ на хост чтоб смотреть метрику
+   ```bash
+   Vagrant.configure("2") do |config|
+ 	   config.vm.box = "bento/ubuntu-20.04"
+	   config.vm.network "forwarded_port", guest: 9100, host: 9100
+   end
+   ```
+   все функции работают корректно:
+   *с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.*
+   
+   
+   
+   
 1. Ознакомьтесь с опциями node_exporter и выводом `/metrics` по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.
 1. Установите в свою виртуальную машину [Netdata](https://github.com/netdata/netdata). Воспользуйтесь [готовыми пакетами](https://packagecloud.io/netdata/netdata/install) для установки (`sudo apt install -y netdata`). После успешной установки:
     * в конфигурационном файле `/etc/netdata/netdata.conf` в секции [web] замените значение с localhost на `bind to = 0.0.0.0`,
