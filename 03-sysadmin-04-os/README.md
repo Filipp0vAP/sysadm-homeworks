@@ -54,7 +54,9 @@
    ```bash
    ExecStart=/home/vagrant/node_exporter-1.3.1.linux-amd64/node_exporter -f $EXTRA_OPTS
    ```
-   
+   update 2:
+   в файле /etc/default/node_exporter укажу что переменная EXTRA_OPTS содержит флаги -a -h
+   и в получается сервис запуститься вот так /home/vagrant/node_exporter-1.3.1.linux-amd64/node_exporter -a -h
    
    
 2. Ознакомьтесь с опциями node_exporter и выводом `/metrics` по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.
