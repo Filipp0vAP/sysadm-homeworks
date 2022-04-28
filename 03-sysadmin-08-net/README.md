@@ -60,12 +60,70 @@ show bgp x.x.x.x/32
    ```
    ---
 2. Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.
-
-
+   ## Ответ
+   ```bash
+   root@vagrant:~# ip link add dummy0 type dummy
+   root@vagrant:~# sudo ip addr add 10.0.29.0/24 dev dummy0
+   root@vagrant:~# sudo ip link set dummy0 up
+   root@vagrant:~#
+   root@vagrant:~# ip address
+   1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+       link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+       inet 127.0.0.1/8 scope host lo
+          valid_lft forever preferred_lft forever
+       inet6 ::1/128 scope host
+          valid_lft forever preferred_lft forever
+   2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+       link/ether 08:00:27:b1:28:5d brd ff:ff:ff:ff:ff:ff
+       inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic eth0
+          valid_lft 83216sec preferred_lft 83216sec
+       inet6 fe80::a00:27ff:feb1:285d/64 scope link
+          valid_lft forever preferred_lft forever
+   3: dummy0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+       link/ether d6:49:c6:fb:ba:fa brd ff:ff:ff:ff:ff:ff
+       inet 10.0.29.0/24 scope global dummy0
+          valid_lft forever preferred_lft forever
+       inet6 fe80::d449:c6ff:fefb:bafa/64 scope link
+          valid_lft forever preferred_lft forever
+   root@vagrant:~# ip route add 8.8.8.0/24 via 10.0.2.1
+   root@vagrant:~# ip route add 8.16.28.0/24 via 10.0.29.0
+   root@vagrant:~# ip route
+   default via 10.0.2.2 dev eth0 proto dhcp src 10.0.2.15 metric 100
+   8.8.8.0/24 via 10.0.2.1 dev eth0
+   8.16.28.0/24 via 10.0.29.0 dev dummy0
+   10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15
+   10.0.2.2 dev eth0 proto dhcp scope link src 10.0.2.15 metric 100
+   10.0.29.0/24 dev dummy0 proto kernel scope link src 10.0.29.0
+   root@vagrant:~#
+   ```
+   ---
 3. Проверьте открытые TCP порты в Ubuntu, какие протоколы и приложения используют эти порты? Приведите несколько примеров.
-
-4. Проверьте используемые UDP сокеты в Ubuntu, какие протоколы и приложения используют эти порты?
-
+   ## Ответ
+   ```bash
+   root@vagrant:~# ss -tpan
+   State         Recv-Q        Send-Q                 Local Address:Port                 Peer Address:Port         Process
+   LISTEN        0             4096                   127.0.0.53%lo:53                        0.0.0.0:*             users:(("systemd-resolve",pid=608,fd=13))
+   LISTEN        0             128                          0.0.0.0:22                        0.0.0.0:*             users:(("sshd",pid=692,fd=3))
+   ESTAB         0             0                          10.0.2.15:22                       10.0.2.2:58779         users:(("sshd",pid=1307,fd=4),("sshd",pid=1260,fd=4))
+   LISTEN        0             128                             [::]:22                           [::]:*             users:(("sshd",pid=692,fd=4))
+   root@vagrant:~#
+   
+   ```
+   22 - port ssh, использует sshd
+   53 - DNS, в моем случае использует systemd-resolve вероятно для резовла и днс запросов
+   ---
+5. Проверьте используемые UDP сокеты в Ubuntu, какие протоколы и приложения используют эти порты?
+   ## Ответ
+   ```bash
+   root@vagrant:~# ss -upan
+   State           Recv-Q          Send-Q                    Local Address:Port                   Peer Address:Port          Process
+   UNCONN          0               0                         127.0.0.53%lo:53                          0.0.0.0:*              users:(("systemd-resolve",pid=608,fd=12))
+   UNCONN          0               0                        10.0.2.15%eth0:68                          0.0.0.0:*              users:(("systemd-network",pid=606,fd=19))
+   ```
+   
+   53 - опять DNS
+   68 - dhcp, у меня на убунту это как видно stemd-network
+   ---
 5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали. 
 
  ---
