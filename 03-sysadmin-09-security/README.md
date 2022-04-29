@@ -6,10 +6,13 @@
     
     ![Bitwarden](./image.png)
     
-
+    ---
+    
 2. Установите Google authenticator на мобильный телефон. Настройте вход в Bitwarden акаунт через Google authenticator OTP.
     ## Ответ
     ![2fa](./2fa.png)
+    
+    ---
     
 3. Установите apache2, сгенерируйте самоподписанный сертификат, настройте тестовый сайт для работы по HTTPS.
     ## Ответ
@@ -18,13 +21,31 @@
     (а еще прописал subjectAltName при создании сертификата, потому что без subjectAltName хром не считал его доверенным даже если я его импортировал)
     ![hi](./hi.png)
     
+    ---
     
 4. Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК ... и тому подобное).
-
+     ## Ответ
+     проверил вас :-)
+     ![pentest](./pentest.png)
+     
+     ---
+     
 5. Установите на Ubuntu ssh сервер, сгенерируйте новый приватный ключ. Скопируйте свой публичный ключ на другой сервер. Подключитесь к серверу по SSH-ключу.
- 
+    ## Ответ
+    ![ssh](./ssh.png)
+    
 6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
-
+    ## Ответ
+    ```
+    Host vagrant
+        HostName 127.0.0.1
+        User vagrant
+        Port 2222
+        IdentityFile C:\Users\filip\.ssh\test
+    ```
+    
+    ![vagrantssh](./vagrantssh.png)
+    
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
 
  ---
@@ -33,8 +54,42 @@
 8*. Просканируйте хост scanme.nmap.org. Какие сервисы запущены?
 
 9*. Установите и настройте фаервол ufw на web-сервер из задания 3. Откройте доступ снаружи только к портам 22,80,443
-
-
+    
+   ## Ответ
+   ```bash
+    vagrant@vagrant:~/testssl.sh$ sudo ufw default deny incoming
+    allow outgoingDefault incoming policy changed to 'deny'
+    (be sure to update your rules accordingly)
+    vagrant@vagrant:~/testssl.sh$ sudo ufw default allow outgoing
+    Default outgoing policy changed to 'allow'
+    (be sure to update your rules accordingly)
+    vagrant@vagrant:~/testssl.sh$
+    vagrant@vagrant:~/testssl.sh$
+    vagrant@vagrant:~/testssl.sh$ sudo ufw allow ssh
+    Rules updated
+    Rules updated (v6)
+    vagrant@vagrant:~/testssl.sh$ sudo ufw allow 22
+    Rules updated
+    Rules updated (v6)
+    vagrant@vagrant:~/testssl.sh$ sudo ufw allow 2222
+    Rules updated
+    Rules updated (v6)
+    vagrant@vagrant:~/testssl.sh$ sudo ufw allow 80
+    Rules updated
+    Rules updated (v6)
+    vagrant@vagrant:~/testssl.sh$ sudo ufw allow 443
+    Rules updated
+    Rules updated (v6)
+    vagrant@vagrant:~/testssl.sh$ sudo ufw allow http
+    Rules updated
+    Rules updated (v6)
+    vagrant@vagrant:~/testssl.sh$ sudo ufw allow https
+    Rules updated
+    Rules updated (v6)
+    vagrant@vagrant:~/testssl.sh$ sudo ufw enable
+    Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+    Firewall is active and enabled on system startup
+   ```
  ---
 
 ## Как сдавать задания
