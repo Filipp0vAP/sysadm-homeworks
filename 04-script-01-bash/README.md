@@ -20,8 +20,27 @@
 	e=$(($a+$b))
 	```
 	* Какие значения переменным c,d,e будут присвоены?
+
+		a = 1
+		
+		b = 2
+		
+		c = a+b
+		
+		d = 1+2
+		
+		e = 3
+		
 	* Почему?
 
+		с первыми двумя присвоениями все просто.
+		
+		с переменной "с" так получилось, потому что что бы получить значение переменной нужно обращаться к ней используя знак $, к прим. $a
+		
+		в переменной "d" значения переменных подставились, но арифметической операции не произошло, а все преоброзовалось в стоку, потому что для ариф.опер. нужно использовать двойные скобки (())
+		
+		вот с переменной "e" все нормально отработало, потому что использовался и знак $ и двойные скобки (())
+		
 1. На нашем локальном сервере упал сервис и мы написали скрипт, который постоянно проверяет его доступность, записывая дату проверок до тех пор, пока сервис не станет доступным. В скрипте допущена ошибка, из-за которой выполнение не может завершиться, при этом место на Жёстком Диске постоянно уменьшается. Что необходимо сделать, чтобы его исправить:
 	```bash
 	while ((1==1)
@@ -33,9 +52,110 @@
 	fi
 	done
 	```
+	
+	# Ответ
+	Я вот так написал, вроде все работает корректно
+	```bash
+	#!/usr/bin/env bash
+
+	while ((1==1))
+	do
+		curl https://localhost:4757
+	if (($? != 0))
+	then
+		date >> ~/curl.log
+		sleep 5
+	else
+		break
+	fi
+	done
+	```
 1. Необходимо написать скрипт, который проверяет доступность трёх IP: 192.168.0.1, 173.194.222.113, 87.250.250.242 по 80 порту и записывает результат в файл log. Проверять доступность необходимо пять раз для каждого узла.
 
+	# Ответ
+	```bash
+	#!/usr/bin/env bash
+
+	function check {
+		link=$1
+		servicename=$2
+
+		curl -s $link > /dev/null
+		echo "$(date) результат проверки 1 $servicename - $?" >> ~/log
+		curl -s $link > /dev/null
+		echo "$(date) результат проверки 2 $servicename - $?" >> ~/log
+		curl -s $link > /dev/null
+		echo "$(date) результат проверки 3 $servicename - $?" >> ~/log
+		curl -s $link > /dev/null
+		echo "$(date) результат проверки 4 $servicename - $?" >> ~/log
+		curl -s $link > /dev/null
+		echo "$(date) результат проверки 5 $servicename - $?" >> ~/log
+	}
+
+	while ((1==1))
+	do
+		check http://87.250.250.242:80/ yandex
+		check http://173.194.222.113:80/ google
+		check http://192.168.0.1:80/ SomeLocalService
+		sleep 10
+	done
+	```
+
+
 1. Необходимо дописать скрипт из предыдущего задания так, чтобы он выполнялся до тех пор, пока один из узлов не окажется недоступным. Если любой из узлов недоступен - IP этого узла пишется в файл error, скрипт прерывается
+	
+	# Ответ
+	```bash
+	#!/usr/bin/env bash
+
+	function check {
+		link=$1
+		servicename=$2
+
+		curl -s $link > /dev/null
+		lastcheck=$?
+		echo "$(date) результат проверки 1 $servicename - $lastcheck" >> ~/log
+		curl -s $link > /dev/null
+		lastcheck=$?
+		echo "$(date) результат проверки 2 $servicename - $lastcheck" >> ~/log
+	        curl -s $link > /dev/null
+		lastcheck=$?
+		echo "$(date) результат проверки 3 $servicename - $lastcheck" >> ~/log
+		curl -s $link > /dev/null
+		lastcheck=$?
+		echo "$(date) результат проверки 4 $servicename - $lastcheck" >> ~/log
+		curl -s $link > /dev/null
+		lastcheck=$?
+		echo "$(date) результат проверки 5 $servicename - $lastcheck" >> ~/log
+	}
+
+	while ((1==1))
+	do
+		check http://87.250.250.242:80/ yandex
+		result1=$lastcheck
+
+		check http://173.194.222.113:80/ google
+		result2=$lastcheck
+
+		check http://192.168.0.1:80/ SomeLocalService
+		result3=$lastcheck
+
+		if (($result1 != 0))
+		then
+			echo "$(date) сервис yandex http://87.250.250.242:80/ не отвечает" >> ~/error
+			break
+		elif (($result2 != 0))
+		then
+			echo "$(date) сервис google http://173.194.222.113:80/ не отвечает" >> ~/error
+			break
+		elif (($result3 != 0))
+		then
+			echo "$(date) сервис SomeLocalService http://192.168.0.1:80/ не отвечает" >> ~/error
+			break
+		fi
+		sleep 10
+	done
+	```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
 
