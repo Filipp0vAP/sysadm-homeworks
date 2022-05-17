@@ -79,17 +79,11 @@
 	function check {
 		link=$1
 		servicename=$2
-
-		curl -s $link > /dev/null
-		echo "$(date) результат проверки 1 $servicename - $?" >> ~/log
-		curl -s $link > /dev/null
-		echo "$(date) результат проверки 2 $servicename - $?" >> ~/log
-		curl -s $link > /dev/null
-		echo "$(date) результат проверки 3 $servicename - $?" >> ~/log
-		curl -s $link > /dev/null
-		echo "$(date) результат проверки 4 $servicename - $?" >> ~/log
-		curl -s $link > /dev/null
-		echo "$(date) результат проверки 5 $servicename - $?" >> ~/log
+		for ((i = 0 ; i <= 4  ; i++)); do
+			curl -s $link > /dev/null
+			lastcheck=$?
+			echo "$(date) результат проверки $(($i+1)) $servicename - $lastcheck" >> ~/log
+		done
 	}
 
 	while ((1==1))
@@ -111,48 +105,23 @@
 	function check {
 		link=$1
 		servicename=$2
-
-		curl -s $link > /dev/null
-		lastcheck=$?
-		echo "$(date) результат проверки 1 $servicename - $lastcheck" >> ~/log
-		curl -s $link > /dev/null
-		lastcheck=$?
-		echo "$(date) результат проверки 2 $servicename - $lastcheck" >> ~/log
-	        curl -s $link > /dev/null
-		lastcheck=$?
-		echo "$(date) результат проверки 3 $servicename - $lastcheck" >> ~/log
-		curl -s $link > /dev/null
-		lastcheck=$?
-		echo "$(date) результат проверки 4 $servicename - $lastcheck" >> ~/log
-		curl -s $link > /dev/null
-		lastcheck=$?
-		echo "$(date) результат проверки 5 $servicename - $lastcheck" >> ~/log
+		for ((i = 0 ; i <= 4  ; i++)); do
+			curl -s $link > /dev/null
+			lastcheck=$?
+			echo "$(date) результат проверки $(($i+1)) $servicename - $lastcheck" >> ~/log
+			if (($lastcheck != 0))
+			then
+				echo "$(date) сервис $servicename $link не отвечает" >> ~/error
+				exit
+			fi
+		done
 	}
 
 	while ((1==1))
 	do
 		check http://87.250.250.242:80/ yandex
-		result1=$lastcheck
-
 		check http://173.194.222.113:80/ google
-		result2=$lastcheck
-
 		check http://192.168.0.1:80/ SomeLocalService
-		result3=$lastcheck
-
-		if (($result1 != 0))
-		then
-			echo "$(date) сервис yandex http://87.250.250.242:80/ не отвечает" >> ~/error
-			break
-		elif (($result2 != 0))
-		then
-			echo "$(date) сервис google http://173.194.222.113:80/ не отвечает" >> ~/error
-			break
-		elif (($result3 != 0))
-		then
-			echo "$(date) сервис SomeLocalService http://192.168.0.1:80/ не отвечает" >> ~/error
-			break
-		fi
 		sleep 10
 	done
 	```
