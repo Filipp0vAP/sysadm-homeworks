@@ -25,6 +25,8 @@
 	* Как получить для переменной c значение 3?
 	конвертировать b в  число - c = a + int(b)
 	
+	---
+	
 1. Мы устроились на работу в компанию, где раньше уже был DevOps Engineer. Он написал скрипт, позволяющий узнать, какие файлы модифицированы в репозитории, относительно локальных изменений. Этим скриптом недовольно начальство, потому что в его выводе есть не все изменённые файлы, а также непонятен полный путь к директории, где они находятся. Как можно доработать скрипт ниже, чтобы он исполнял требования вашего руководителя?
 
 	```python
@@ -32,7 +34,7 @@
 
     import os
 
-	bash_command = ["cd ~/netology/sysadm-homeworks", "git status"]
+	bash_command = ["cd ~/netology/sysadm-homeworks/", "git status"]
 	result_os = os.popen(' && '.join(bash_command)).read()
     is_change = False
 	for result in result_os.split('\n'):
@@ -42,6 +44,25 @@
             break
 
 	```
+
+	## Ответ
+	
+	```python
+	#!/usr/bin/env python3
+
+	import os
+	gitpath = "~/netology/netology-sysadm-homeworks/"
+	bash_command = ["cd " + gitpath, "git status"]
+	result_os = os.popen(' && '.join(bash_command)).read()
+
+	for result in result_os.split('\n'):
+	    if result.find('modified') != -1:
+		prepare_result = result.replace('\tmodified:   ', '')
+		print(gitpath + prepare_result)
+	
+	```
+	убрал лишний break и лишнюю перменную is_change.
+	А так же завернул путь до репы в переменную и потом ее склеиваю с результатом вывода. Так понятнее где нужные файлы
 
 1. Доработать скрипт выше так, чтобы он мог проверять не только локальный репозиторий в текущей директории, а также умел воспринимать путь к репозиторию, который мы передаём как входной параметр. Мы точно знаем, что начальство коварное и будет проверять работу этого скрипта в директориях, которые не являются локальными репозиториями.
 
